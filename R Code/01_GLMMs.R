@@ -84,7 +84,7 @@ Duration_recruit_model <- lmer(log(time.to.assistant+1) ~ h_index*Assistant.sinc
 
 # Model results
 summary(Duration_recruit_model)
-Anova(Duration_recruit_model)
+Anova(Duration_recruit_model, type = 3)  # type 3 anova for significant interaction term
 
 # Model validation
 ggplot(data = data.frame(x = fitted(Duration_recruit_model),

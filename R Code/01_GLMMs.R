@@ -4,22 +4,11 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2022-02-03
+## Date: 2022-12-31
 ##
 ## Description:
-## 1. Fit GLMMs to examine the relationship of academic performance before 
-##    recruitment/promotion vs. year of recruitment/promotion, PhD university origin, 
-##    PhD university ranking, and gender
-## 2. Fit GLMMs to examine the relationship of duration for recruitment/promotion vs. 
-##    year of recruitment/promotion, PhD university origin, PhD university ranking,
-##    gender, and academic performance
-## 3. Fit GLMMs to examine the relationship of difference in academic performance 
-##    before and after recruitment/promotion vs. year of recruitment/promotion, 
-##    PhD university origin, PhD university ranking, and gender
+## 1. 
 ##
-## Notes:
-## 1. This is only part of the entire data analyses of this project. Full code is 
-##    available at the corresponding author Dr. Syuan-Jyun Sun (sysun@umich.edu)
 ##
 ## -----------------------------------------------------------------------------
 set.seed(123)
@@ -28,33 +17,47 @@ set.seed(123)
 # Libraries --------------------------------------------------------------------
 library(tidyverse)
 library(lme4)
+library(emmeans)
 library(car)
+library(performance)
 
 
 # Import files -----------------------------------------------------------------
-Performance_duration_df <- read.csv("./Data_raw/publishperishdata.csv", header = T)
-Performance_diff_df <- read.csv("./Data_raw/publishperish_h_index_diff.csv", header = T)
+PI_df <- read.csv("./Data_raw/publishperishdata.csv", header = T)
 
 
 ############################### Code starts here ###############################
 
 # 1. Academic performance ------------------------------------------------------
 ### (1) Recruitment 
-Performance_recruit_model <- lmer(log(h_index+1) ~ Assistant.since + PhD.taiwan + 
-                                  PhD.uni.rank + sex + (1|University/Department), 
-                                  data = filter(Performance_duration_df, 
-                                                stage == "assistant" & 
-                                                beforeafter == "after"))
+Performance_recruitment_model_poisson <- glmer(h_index ~ Assistant.since + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                               data = filter(PI_df, stage == "assistant" & beforeafter == "before"),
+                                               family = "poisson")
+
+Performance_recruitment_model_gaussian <- lmer(h_index ~ Assistant.since + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                               data = filter(PI_df, stage == "assistant" & beforeafter == "before"))
+
+# Poisson error distribution fits better
+AIC(Performance_recruitment_model_poisson, Performance_recruitment_model_gaussian)
 
 # Model results
-summary(Performance_recruit_model)
-Anova(Performance_recruit_model)
+summary(Performance_recruitment_model_poisson)
+Anova(Performance_recruitment_model_poisson)
+confint(Performance_recruitment_model_poisson, method = "boot")
 
 # Model validation
-ggplot(data = data.frame(x = fitted(Performance_recruit_model),
-                         y = resid(Performance_recruit_model))) + 
-  geom_point(aes(x, y)) + 
-  geom_smooth(aes(x, y))
+check_model(Performance_recruitment_model_gaussian, check = "normality")
+check_model(Performance_recruitment_model_gaussian, check = "qq")
+check_model(Performance_recruitment_model_gaussian, check = "homogeneity")
+check_model(Performance_recruitment_model_gaussian, check = "linearity")
+
+
+
+
+
+
+
+
 
 ### (2) Promotion
 Performance_promotion_model <- lmer(log(h_index+1) ~ full.professor + PhD.taiwan + 

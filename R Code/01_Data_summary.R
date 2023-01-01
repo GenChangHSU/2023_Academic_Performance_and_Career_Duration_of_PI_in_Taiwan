@@ -4,11 +4,10 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2022-02-06
+## Date: 2023-01-01
 ##
 ## Description:
-## 1. Summarize the PhD university countries, PhD university rankings, and gender 
-##    composition of the faculty members in the study 
+## 1. Summary of the variables in the data set
 ##
 ## -----------------------------------------------------------------------------
 set.seed(123)

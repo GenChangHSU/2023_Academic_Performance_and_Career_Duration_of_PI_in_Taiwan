@@ -4,12 +4,12 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2022-12-31
+## Date: 2023-01-01
 ##
 ## Description:
-##  
-##
-##
+## 1. GLMMs for the academic performance before recruitment/promotion.
+## 2. GLMMs for the career duration before recruitment/promotion.
+## 3. LMMs for the difference in academic performance before and after recruitment/promotion.
 ## -----------------------------------------------------------------------------
 set.seed(123)
 
@@ -17,7 +17,6 @@ set.seed(123)
 # Libraries --------------------------------------------------------------------
 library(tidyverse)
 library(lme4)
-library(emmeans)
 library(car)
 library(performance)
 

@@ -4,12 +4,12 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2023-01-03
+## Date: 2023-02-12
 ##
 ## Description:
-## 1. 
-##
-##
+## 1. Histogram of university rankings.
+## 2. Scatterplots of academic performance/career duration vs. year
+## 3. Scatterplots of difference in academic performance vs. year & boxplots of PhD origin
 ## -----------------------------------------------------------------------------
 set.seed(123)
 
@@ -17,6 +17,7 @@ set.seed(123)
 # Libraries --------------------------------------------------------------------
 library(tidyverse)
 library(patchwork)
+library(MASS)
 
 
 # Import files -----------------------------------------------------------------
@@ -95,8 +96,7 @@ ggsave("./Outputs/Figures/Phd_hist.tiff", width = 5, height = 4, dpi = 600, devi
 # 2. Scatterplots of academic performance/career duration vs. year -------------
 P_performance_recruitment <- ggplot(data = filter(PI_df, beforeafter == "before" & stage == "assistant")) + 
   geom_point(aes(x = Assistant.since, y = h_index)) + 
-  geom_smooth(aes(x = Assistant.since, y = h_index, color = sex), method = "glm", method.args = list(family = "poisson"),
-              se = T) + 
+  geom_smooth(aes(x = Assistant.since, y = h_index, color = sex), method = "glm.nb", se = T) + 
   labs(x = "Year of recruitment", y = 'Academic performance ("Before" h-index)',
        title = "(a)") +
   scale_x_continuous(limits = c(1990, 2020), breaks = c(1990, 2000, 2010, 2020)) +

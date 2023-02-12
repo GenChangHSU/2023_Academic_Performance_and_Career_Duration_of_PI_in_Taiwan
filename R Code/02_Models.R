@@ -4,12 +4,13 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2023-01-01
+## Date: 2023-02-12
 ##
 ## Description:
 ## 1. GLMMs for the academic performance before recruitment/promotion.
 ## 2. GLMMs for the career duration before recruitment/promotion.
 ## 3. LMMs for the difference in academic performance before and after recruitment/promotion.
+## 4. Summary table for the model results.
 ## -----------------------------------------------------------------------------
 set.seed(123)
 
@@ -36,16 +37,25 @@ Performance_recruitment_model_gaussian <- lmer(h_index ~ Assistant.since + PhD.t
 Performance_recruitment_model_poisson <- glmer(h_index ~ Assistant.since + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
                                                data = filter(PI_df, stage == "assistant" & beforeafter == "before"),
                                                family = "poisson")
+
+Performance_recruitment_model_nb <- glmer.nb(h_index ~ Assistant.since + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                             data = filter(PI_df, stage == "assistant" & beforeafter == "before"))
+
+# Check for overdispersion in the Poisson model 
+check_overdispersion(Performance_recruitment_model_poisson)
+
 # Model selection
-AIC(Performance_recruitment_model_gaussian, Performance_recruitment_model_poisson)
+AIC(Performance_recruitment_model_gaussian, 
+    Performance_recruitment_model_poisson,
+    Performance_recruitment_model_nb)
 
 # Model outputs
-Performance_recruitment_model_poisson_summary <- summary(Performance_recruitment_model_poisson)
-Performance_recruitment_model_poisson_Anova <- Anova(Performance_recruitment_model_poisson)
-Performance_recruitment_model_poisson_CI <- confint(Performance_recruitment_model_poisson, method = "boot", nsim = 1000)
+Performance_recruitment_model_nb_summary <- summary(Performance_recruitment_model_nb)
+Performance_recruitment_model_nb_Anova <- Anova(Performance_recruitment_model_nb)
+Performance_recruitment_model_nb_CI <- confint(Performance_recruitment_model_nb, method = "boot", nsim = 1000)
 
 # Model diagnostics
-check_model(Performance_recruitment_model_poisson, check = c("normality", "qq", "homogeneity", "linearity"))
+check_model(Performance_recruitment_model_nb, check = c("normality", "qq", "homogeneity", "linearity"))
 ggsave("./Outputs/Figures/Performance_recruitment.tiff", width = 7, height = 4, dpi = 600, device = "tiff")
 
 
@@ -58,8 +68,16 @@ Performance_promotion_model_poisson <- glmer(h_index ~ full.professor + PhD.taiw
                                              data = filter(PI_df, stage == "full" & beforeafter == "before"),
                                              family = "poisson")
 
+# The negative bionomial model did not converge
+Performance_promotion_model_nb <- glmer.nb(h_index ~ full.professor + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                             data = filter(PI_df, stage == "full" & beforeafter == "before"))
+
+# Check for overdispersion in the Poisson model 
+check_overdispersion(Performance_promotion_model_poisson)
+
 # Model selection
-AIC(Performance_promotion_model_gaussian, Performance_promotion_model_poisson)
+AIC(Performance_promotion_model_gaussian, 
+    Performance_promotion_model_poisson)
 
 # Model outputs
 Performance_promotion_model_poisson_summary <- summary(Performance_promotion_model_poisson)
@@ -69,7 +87,6 @@ Performance_promotion_model_poisson_CI <- confint(Performance_promotion_model_po
 # Model diagnostics
 check_model(Performance_promotion_model_poisson, check = c("normality", "qq", "homogeneity", "linearity"))
 ggsave("./Outputs/Figures/Performance_promotion.tiff", width = 7, height = 4, dpi = 600, device = "tiff")
-
 
 
 # 2. Career duration -----------------------------------------------------------
@@ -82,8 +99,16 @@ Duration_recruitment_model_poisson <- glmer(time.to.assistant ~ h_index + Assist
                                             data = filter(PI_df, stage == "assistant" & beforeafter == "before"),
                                             family = "poisson")
 
+# The negative bionomial model did not converge
+Duration_recruitment_model_nb <- glmer.nb(time.to.assistant ~ h_index + Assistant.since + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                            data = filter(PI_df, stage == "assistant" & beforeafter == "before"))
+
+# Check for overdispersion in the Poisson model 
+check_overdispersion(Duration_recruitment_model_poisson)
+
 # Model selection
-AIC(Duration_recruitment_model_gaussian, Duration_recruitment_model_poisson)
+AIC(Duration_recruitment_model_gaussian, 
+    Duration_recruitment_model_poisson)
 
 # Model outputs
 Duration_recruitment_model_poisson_summary <- summary(Duration_recruitment_model_poisson)
@@ -104,8 +129,16 @@ Duration_promotion_model_poisson <- glmer(time.to.full ~ h_index + full.professo
                                           data = filter(PI_df, stage == "full" & beforeafter == "before"),
                                           family = "poisson")
 
+Duration_promotion_model_nb <- glmer.nb(time.to.full ~ h_index + full.professor + PhD.taiwan + PhD.uni.rank + sex + (1|University/Department), 
+                                          data = filter(PI_df, stage == "full" & beforeafter == "before"))
+
+# Check for overdispersion in the Poisson model
+check_overdispersion(Duration_promotion_model_poisson)
+
 # Model selection
-AIC(Duration_promotion_model_gaussian, Duration_promotion_model_poisson)
+AIC(Duration_promotion_model_gaussian, 
+    Duration_promotion_model_poisson,
+    Duration_promotion_model_nb)
 
 # Model outputs
 Duration_promotion_model_poisson_summary <- summary(Duration_promotion_model_poisson)
@@ -157,7 +190,7 @@ ggsave("./Outputs/Figures/Diff_promotion.tiff", width = 7, height = 4, dpi = 600
 
 
 # 4. Summary table for the model results ---------------------------------------
-model1_summary <- Performance_recruitment_model_poisson_summary$coefficients[2:5, 1:2] %>% 
+model1_summary <- Performance_recruitment_model_nb_summary$coefficients[2:5, 1:2] %>% 
   as.data.frame() %>% 
   rownames_to_column(var = "Predictor") %>% 
   mutate(model = 1, 

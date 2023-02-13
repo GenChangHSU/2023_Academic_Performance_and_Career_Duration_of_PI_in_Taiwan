@@ -66,6 +66,10 @@ PI_df %>%
   group_by(PhD.taiwan) %>%
   summarise(Median = median(PhD.uni.rank, na.rm = T))
 
-
-
+### (7) Number of PIs from each university/institute
+PI_df %>% 
+  filter(stage == "assistant" & beforeafter == "before") %>%
+  group_by(University) %>% 
+  summarize(n = n()) %>% 
+  arrange(desc(n))
 

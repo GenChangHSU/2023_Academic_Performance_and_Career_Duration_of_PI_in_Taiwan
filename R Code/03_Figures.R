@@ -168,7 +168,7 @@ ggsave("./Outputs/Figures/perf_duration_scatterplot.tiff", width = 10, height = 
 
 # 3. Scatterplots of difference in academic performance vs. year & boxplots of PhD origin -----
 PI_diff_df <- PI_df %>% 
-  select(1, University, Department, Assistant.since, full.professor, PhD.taiwan, PhD.uni.rank, sex, h_index, stage, beforeafter) %>% 
+  dplyr::select(search.id, University, Department, Assistant.since, full.professor, PhD.taiwan, PhD.uni.rank, sex, h_index, stage, beforeafter) %>% 
   pivot_wider(names_from = stage, values_from = h_index) %>% 
   pivot_wider(names_from = beforeafter, values_from = c(assistant, full)) %>% 
   mutate(recruitment_diff = assistant_after - assistant_before,

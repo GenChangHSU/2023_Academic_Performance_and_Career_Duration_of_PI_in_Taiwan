@@ -34,7 +34,8 @@ PI_df %$%
 ### (2) Gender composition
 PI_df %>% 
   filter(stage == "assistant" & beforeafter == "before") %>%
-  count(sex)
+  count(sex) %>% 
+  mutate(prop = n/sum(n))
 
 ### (3) Academic rank composition
 PI_df %>% 
@@ -99,14 +100,40 @@ all_PI_df %>%
 ### (4) Gender composition of all EEB PIs from public universities
 all_PI_df %>% 
   filter(university_type == "public") %>%
-  count(sex)
+  count(sex) %>% 
+  mutate(prop = n/sum(n))
+
+n_observed <- PI_df %>% 
+  filter(stage == "assistant" & beforeafter == "before") %>%
+  count(sex) %>% 
+  pull(n)
+
+p_expected <- all_PI_df %>% 
+  filter(university_type == "public") %>% 
+  count(sex) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  pull(prop)
+
+chisq.test(x = n_observed, p = p_expected)
 
 ### (5) Academic rank composition of PIs from public universities
 all_PI_df %>% 
   filter(university_type == "public") %>% 
-  count(Position)
+  count(Position) %>% 
+  mutate(prop = n/sum(n))
 
+n_observed <- PI_df %>% 
+  filter(stage == "assistant" & beforeafter == "before") %>%
+  count(Position) %>% 
+  pull(n)
 
+p_expected <- all_PI_df %>% 
+  filter(university_type == "public") %>% 
+  count(Position) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  pull(prop)
+
+chisq.test(x = n_observed, p = p_expected)
 
 
 

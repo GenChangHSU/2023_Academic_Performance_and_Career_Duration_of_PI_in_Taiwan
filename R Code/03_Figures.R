@@ -4,7 +4,7 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2023-02-12
+## Date: 2023-03-27
 ##
 ## Description:
 ## 1. Histogram of university rankings.
@@ -21,8 +21,14 @@ library(MASS)
 
 
 # Import files -----------------------------------------------------------------
-PI_df <- read.csv("./Data_raw/publishperishdata.csv", header = T)
-
+PI_df <- read_xlsx("./Data_raw/PI_data.xlsx", sheet = 1)
+PI_df <- PI_df %>% 
+  mutate(PhD.uni.rank = as.numeric(PhD.uni.rank),
+         h_index = as.numeric(h_index),
+         Assistant.since = as.numeric(Assistant.since),
+         full.professor = as.numeric(full.professor),
+         time.to.assistant = as.numeric(time.to.assistant),
+         time.to.full = as.numeric(time.to.full))
 
 # ggplot theme -----------------------------------------------------------------
 my_theme <- 
@@ -67,12 +73,12 @@ my_theme <-
 ############################### Code starts here ###############################
 
 # 1. Histogram of university rankings ------------------------------------------
-Phd_rank_median <- distinct(PI_df, Name, .keep_all = T) %>% 
+Phd_rank_median <- distinct(PI_df, search.id, .keep_all = T) %>% 
   group_by(PhD.taiwan) %>% 
   summarise(median = median(PhD.uni.rank, na.rm = T),
             n = n())
 
-ggplot(data = distinct(PI_df, Name, .keep_all = T)) + 
+ggplot(data = distinct(PI_df, search.id, .keep_all = T)) + 
   geom_histogram(aes(x = PhD.uni.rank, color = PhD.taiwan, fill = PhD.taiwan), 
                  alpha = 0.7, size = 0.7, bins = 60) + 
   geom_vline(data = Phd_rank_median, aes(xintercept = median, color = PhD.taiwan),
@@ -154,7 +160,7 @@ P_duration_promotion <- ggplot(data = filter(PI_df, beforeafter == "before" & st
   scale_y_continuous(limits = c(0, 25)) + 
   my_theme + 
   theme(plot.title = element_text(vjust = 1, hjust = 0)) + 
-  annotate(geom = "text", x = 1995, y = 20, label = "italic(P) == 0.02", 
+  annotate(geom = "text", x = 1995, y = 20, label = "italic(P) == 0.05", 
            parse = T, size = 5)
 
 P_duration_promotion
@@ -202,7 +208,7 @@ P_diff_recruitment_botplot <- ggplot(data = PI_diff_df) +
   scale_fill_manual(values = c("#d95f02", "#1b9e77")) +
   my_theme + 
   theme(plot.title = element_text(vjust = 1, hjust = 0)) + 
-  annotate(geom = "text", x = 1.5, y = 20, label = "italic(P) == 0.52", 
+  annotate(geom = "text", x = 1.5, y = 20, label = "italic(P) == 0.84", 
            parse = T, size = 5)
 
 P_diff_recruitment_botplot 
@@ -217,7 +223,7 @@ P_diff_promotion <- ggplot(data = PI_diff_df) +
   scale_y_continuous(limits = c(-10, 10)) + 
   my_theme + 
   theme(plot.title = element_text(vjust = 1, hjust = 0)) + 
-  annotate(geom = "text", x = 1995, y = 8, label = "italic(P) == 0.09", 
+  annotate(geom = "text", x = 1995, y = 8, label = "italic(P) == 0.1*0", 
            parse = T, size = 5)
 
 P_diff_promotion
@@ -235,7 +241,7 @@ P_diff_promotion_botplot <- ggplot(data = PI_diff_df) +
   scale_fill_manual(values = c("#d95f02", "#1b9e77")) +
   my_theme + 
   theme(plot.title = element_text(vjust = 1, hjust = 0)) + 
-  annotate(geom = "text", x = 1.5, y = 8, label = "italic(P) == 0.06", 
+  annotate(geom = "text", x = 1.5, y = 8, label = "italic(P) == 0.09", 
            parse = T, size = 5)
 
 P_diff_promotion_botplot 

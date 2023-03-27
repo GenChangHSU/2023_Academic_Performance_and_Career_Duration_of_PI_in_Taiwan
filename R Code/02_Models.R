@@ -4,7 +4,7 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2023-02-12
+## Date: 2023-03-27
 ##
 ## Description:
 ## 1. GLMMs for the academic performance before recruitment/promotion.
@@ -23,8 +23,14 @@ library(performance)
 
 
 # Import files -----------------------------------------------------------------
-PI_df <- read.csv("./Data_raw/publishperishdata.csv", header = T)
-
+PI_df <- read_xlsx("./Data_raw/PI_data.xlsx", sheet = 1)
+PI_df <- PI_df %>% 
+  mutate(PhD.uni.rank = as.numeric(PhD.uni.rank),
+         h_index = as.numeric(h_index),
+         Assistant.since = as.numeric(Assistant.since),
+         full.professor = as.numeric(full.professor),
+         time.to.assistant = as.numeric(time.to.assistant),
+         time.to.full = as.numeric(time.to.full))
 
 ############################### Code starts here ###############################
 
@@ -154,7 +160,7 @@ ggsave("./Outputs/Figures/Duration_promotion.tiff", width = 7, height = 4, dpi =
 # 3. Performance difference ----------------------------------------------------
 # Compute the differences in h-index during recruitment and promotion phase
 PI_diff_df <- PI_df %>% 
-  select(search.id, University, Department, Assistant.since, full.professor, PhD.taiwan, PhD.uni.rank, sex, h_index, stage, beforeafter) %>% 
+  dplyr::select(search.id, University, Department, Assistant.since, full.professor, PhD.taiwan, PhD.uni.rank, sex, h_index, stage, beforeafter) %>% 
   pivot_wider(names_from = stage, values_from = h_index) %>% 
   pivot_wider(names_from = beforeafter, values_from = c(assistant, full)) %>% 
   mutate(recruitment_diff = assistant_after - assistant_before,

@@ -4,7 +4,7 @@
 ##
 ## Author: Gen-Chang Hsu
 ##
-## Date: 2023-01-01
+## Date: 2023-03-27
 ##
 ## Description:
 ## 1. Summary of the variables in the data set
@@ -20,7 +20,14 @@ library(readxl)
 
 
 # Import files -----------------------------------------------------------------
-PI_df <- read.csv("./Data_raw/publishperishdata.csv", header = T)
+PI_df <- read_xlsx("./Data_raw/PI_data.xlsx", sheet = 1)
+PI_df <- PI_df %>% 
+  mutate(PhD.uni.rank = as.numeric(PhD.uni.rank),
+         h_index = as.numeric(h_index),
+         Assistant.since = as.numeric(Assistant.since),
+         full.professor = as.numeric(full.professor),
+         time.to.assistant = as.numeric(time.to.assistant),
+         time.to.full = as.numeric(time.to.full))
 other_PI_df <- read_xlsx("./Data_raw/other_PI_data.xlsx", sheet = 1)
 
 ############################### Code starts here ###############################
@@ -28,7 +35,7 @@ other_PI_df <- read_xlsx("./Data_raw/other_PI_data.xlsx", sheet = 1)
 # 1. Data summary --------------------------------------------------------------
 ### (1) Number of faculty members
 PI_df %$% 
-  unique(Name) %>%
+  unique(search.id) %>%
   length()
 
 ### (2) Gender composition

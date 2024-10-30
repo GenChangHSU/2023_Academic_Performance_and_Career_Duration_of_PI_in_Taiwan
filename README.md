@@ -1,6 +1,6 @@
 ## Temporal trends in academic performance and career duration of principal investigators in ecology and evolutionary biology in Taiwan
 
-__Hsu, G-C.__, W-J. Lin, and S-J. Sun. 2023. Temporal trends in academic performance and career duration of principal investigators in ecology and evolutionary biology in Taiwan. __*Scientometrics*__ 128: 3437–3451.
+__Hsu, G-C.__, W-J. Lin, and S-J. Sun. 2023. Temporal trends in academic performance and career duration of principal investigators in ecology and evolutionary biology in Taiwan. *Scientometrics* 128: 3437–3451.
 
 ## Abstract
 
